@@ -1,0 +1,4 @@
+/* Redireccionamiento SPA para Netlify
+   Todas las rutas son manejadas por React (index.html)
+   Este archivo debe estar en la carpeta public/ */
+/*    /index.html   200
