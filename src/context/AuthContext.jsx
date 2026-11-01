@@ -28,7 +28,7 @@ export function AuthProvider({ children }) {
       uid: user.uid,
       email: user.email,
       displayName: displayName || email.split('@')[0],
-      balanceUsdt: 50.00, // Bono de bienvenida inicial para pruebas
+      balanceUsdt: 0.00,
       createdAt: serverTimestamp(),
       role: 'user', // user | merchant | p2p_agent
       lastLogin: serverTimestamp()
@@ -62,12 +62,12 @@ export function AuthProvider({ children }) {
           if (docSnap.exists()) {
             setUserProfile(docSnap.data());
           } else {
-            // Si no existe perfil en Firestore, crearlo
+            // Si no existe perfil en Firestore, crearlo con saldo 0
             const fallbackProfile = {
               uid: user.uid,
               email: user.email,
-              displayName: user.email.split('@')[0],
-              balanceUsdt: 50.00,
+              displayName: user.displayName || user.email.split('@')[0],
+              balanceUsdt: 0.00,
               createdAt: serverTimestamp()
             };
             await setDoc(userDocRef, fallbackProfile);
@@ -79,7 +79,7 @@ export function AuthProvider({ children }) {
             uid: user.uid,
             email: user.email,
             displayName: user.email.split('@')[0],
-            balanceUsdt: 125.50
+            balanceUsdt: 0.00
           });
         }
       } else {

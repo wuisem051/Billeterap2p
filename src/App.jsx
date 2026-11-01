@@ -27,6 +27,22 @@ function MainApp() {
     vesRate: 36.80  // USDT / VES
   };
 
+  // Proteger acceso: si no está logueado, abrir modal de autenticación
+  const handleSelectRole = (role) => {
+    if (role !== 'home' && !currentUser) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+    setCurrentRole(role);
+  };
+
+  // Mantener sincronizado el saldo USDT con el perfil del usuario en Firestore
+  const currentBalances = {
+    ...balances,
+    USDT: userProfile?.balanceUsdt !== undefined ? userProfile.balanceUsdt : (balances.USDT || 0)
+  };
+
+
   const handleUnlockSuccess = (unlockedData) => {
     setIsVaultLocked(false);
   };
@@ -52,37 +68,91 @@ function MainApp() {
       <div>
         <Navbar 
           currentRole={currentRole} 
-          onSelectRole={setCurrentRole} 
+          onSelectRole={handleSelectRole} 
           onOpenAuth={() => setIsAuthModalOpen(true)}
           isOnline={true}
         />
 
         <main className="container mx-auto py-2">
           {currentRole === 'home' && (
-            <HomeLanding onLaunchApp={(role) => setCurrentRole(role)} />
+            <HomeLanding onLaunchApp={(role) => handleSelectRole(role)} />
           )}
 
           {currentRole === 'wallet' && (
-            <WalletDashboard
-              balances={balances}
-              rates={rates}
-              onOpenScanner={() => alert('Escáner activado: Cámara lista para leer QR de factura PoS')}
-              onOpenReceive={() => setIsReceiveModalOpen(true)}
-              onOpenWithdraw={() => setIsWithdrawModalOpen(true)}
-              onOpenCreateVoucher={() => setIsVoucherModalOpen(true)}
-              onLockVault={() => setIsVaultLocked(true)}
-            />
+            currentUser ? (
+              <WalletDashboard
+                balances={currentBalances}
+                rates={rates}
+                onOpenScanner={() => alert('Escáner activado: Cámara lista para leer QR de factura PoS')}
+                onOpenReceive={() => setIsReceiveModalOpen(true)}
+                onOpenWithdraw={() => setIsWithdrawModalOpen(true)}
+                onOpenCreateVoucher={() => setIsVoucherModalOpen(true)}
+                onLockVault={() => setIsVaultLocked(true)}
+              />
+            ) : (
+              <div className="max-w-md mx-auto text-center py-16 px-4 space-y-4">
+                <div className="w-16 h-16 rounded-3xl bg-emerald-500/10 text-emerald-400 mx-auto flex items-center justify-center font-bold text-2xl">
+                  🔒
+                </div>
+                <h2 className="text-xl font-bold text-white">Registro Requerido</h2>
+                <p className="text-sm text-slate-400">
+                  Para acceder a tu billetera y gestionar tus fondos debes registrarte o iniciar sesión con tu cuenta.
+                </p>
+                <button
+                  onClick={() => setIsAuthModalOpen(true)}
+                  className="px-6 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm shadow-lg shadow-emerald-500/20 transition-all"
+                >
+                  Crear Cuenta / Iniciar Sesión
+                </button>
+              </div>
+            )
           )}
 
           {currentRole === 'pos' && (
-            <PosTerminal
-              rates={rates}
-              merchantName={userProfile?.displayName ? `PoS de ${userProfile.displayName}` : "Comercio Aliado P2P"}
-            />
+            currentUser ? (
+              <PosTerminal
+                rates={rates}
+                merchantName={userProfile?.displayName ? `PoS de ${userProfile.displayName}` : "Comercio Aliado P2P"}
+              />
+            ) : (
+              <div className="max-w-md mx-auto text-center py-16 px-4 space-y-4">
+                <div className="w-16 h-16 rounded-3xl bg-emerald-500/10 text-emerald-400 mx-auto flex items-center justify-center font-bold text-2xl">
+                  🔒
+                </div>
+                <h2 className="text-xl font-bold text-white">Acceso al Punto de Venta</h2>
+                <p className="text-sm text-slate-400">
+                  Registra tu negocio para empezar a recibir pagos en USDT.
+                </p>
+                <button
+                  onClick={() => setIsAuthModalOpen(true)}
+                  className="px-6 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm shadow-lg shadow-emerald-500/20 transition-all"
+                >
+                  Registrarse como Comercio
+                </button>
+              </div>
+            )
           )}
 
           {currentRole === 'p2p' && (
-            <P2pExchange rates={rates} />
+            currentUser ? (
+              <P2pExchange rates={rates} />
+            ) : (
+              <div className="max-w-md mx-auto text-center py-16 px-4 space-y-4">
+                <div className="w-16 h-16 rounded-3xl bg-emerald-500/10 text-emerald-400 mx-auto flex items-center justify-center font-bold text-2xl">
+                  🔒
+                </div>
+                <h2 className="text-xl font-bold text-white">Cajeros y P2P</h2>
+                <p className="text-sm text-slate-400">
+                  Debes contar con una cuenta activa para comprar o vender USDT en bolívares.
+                </p>
+                <button
+                  onClick={() => setIsAuthModalOpen(true)}
+                  className="px-6 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm shadow-lg shadow-emerald-500/20 transition-all"
+                >
+                  Ingresar a P2P
+                </button>
+              </div>
+            )
           )}
         </main>
       </div>

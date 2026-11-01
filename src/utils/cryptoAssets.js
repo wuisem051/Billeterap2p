@@ -54,8 +54,9 @@ export const SUPPORTED_ASSETS = [
 ];
 
 export const DEFAULT_BALANCES = {
-  USDT: 125.50,
-  ETH: 0.045,
-  LTC: 1.85,
-  DOGE: 420.00
+  USDT: 0.00,
+  ETH: 0.0000,
+  LTC: 0.0000,
+  DOGE: 0.00
 };
+

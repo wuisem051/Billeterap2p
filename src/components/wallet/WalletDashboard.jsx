@@ -34,44 +34,8 @@ export default function WalletDashboard({
 
   const totalVesValue = totalUsdValue * (rates.vesRate || 36.80);
 
-  const [transactions] = useState([
-    {
-      id: 'tx_01',
-      type: 'payment',
-      title: 'Café Panadería Express (PoS)',
-      amount: -4.50,
-      symbol: 'USDT',
-      timestamp: 'Hoy, 10:45 AM',
-      status: 'confirmado'
-    },
-    {
-      id: 'tx_02',
-      type: 'receive',
-      title: 'Depósito On-Chain DOGE',
-      amount: +150.00,
-      symbol: 'DOGE',
-      timestamp: 'Hoy, 08:30 AM',
-      status: 'confirmado'
-    },
-    {
-      id: 'tx_03',
-      type: 'voucher_created',
-      title: 'Vale Digital Creado #892',
-      amount: -15.00,
-      symbol: 'USDT',
-      timestamp: 'Ayer, 04:20 PM',
-      status: 'bloqueado'
-    },
-    {
-      id: 'tx_04',
-      type: 'receive',
-      title: 'Recarga Cajero P2P (Pago Móvil)',
-      amount: +50.00,
-      symbol: 'USDT',
-      timestamp: '27 Oct, 02:15 PM',
-      status: 'confirmado'
-    }
-  ]);
+  const [transactions, setTransactions] = useState([]);
+
 
   return (
     <div className="w-full max-w-md mx-auto space-y-6 pb-24 animate-fade-in px-4">
@@ -238,37 +202,44 @@ export default function WalletDashboard({
         </div>
 
         <div className="space-y-2">
-          {transactions.map((tx) => (
-            <div 
-              key={tx.id} 
-              className="flex items-center justify-between p-3 rounded-2xl bg-slate-900/60 border border-slate-800/60 hover:bg-slate-900 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-xl ${
-                  tx.amount > 0 
-                    ? 'bg-emerald-500/10 text-emerald-400' 
-                    : tx.type === 'voucher_created'
-                    ? 'bg-amber-500/10 text-amber-400'
-                    : 'bg-rose-500/10 text-rose-400'
-                }`}>
-                  {tx.amount > 0 ? <ArrowDownLeft size={16} /> : <ArrowUpRight size={16} />}
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-slate-200">{tx.title}</p>
-                  <p className="text-[11px] text-slate-500">{tx.timestamp}</p>
-                </div>
-              </div>
-
-              <div className="text-right">
-                <p className={`text-xs font-mono font-bold ${
-                  tx.amount > 0 ? 'text-emerald-400' : 'text-slate-200'
-                }`}>
-                  {tx.amount > 0 ? `+${tx.amount}` : tx.amount} {tx.symbol}
-                </p>
-                <p className="text-[10px] text-slate-500 capitalize">{tx.status}</p>
-              </div>
+          {transactions.length === 0 ? (
+            <div className="text-center py-6 px-4 rounded-2xl bg-slate-900/40 border border-slate-800/40 text-slate-500 text-xs">
+              <History size={20} className="mx-auto mb-2 opacity-40" />
+              <span>Aún no tienes movimientos registrados</span>
             </div>
-          ))}
+          ) : (
+            transactions.map((tx) => (
+              <div 
+                key={tx.id} 
+                className="flex items-center justify-between p-3 rounded-2xl bg-slate-900/60 border border-slate-800/60 hover:bg-slate-900 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`p-2 rounded-xl ${
+                    tx.amount > 0 
+                      ? 'bg-emerald-500/10 text-emerald-400' 
+                      : tx.type === 'voucher_created'
+                      ? 'bg-amber-500/10 text-amber-400'
+                      : 'bg-rose-500/10 text-rose-400'
+                  }`}>
+                    {tx.amount > 0 ? <ArrowDownLeft size={16} /> : <ArrowUpRight size={16} />}
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-slate-200">{tx.title}</p>
+                    <p className="text-[11px] text-slate-500">{tx.timestamp}</p>
+                  </div>
+                </div>
+
+                <div className="text-right">
+                  <p className={`text-xs font-mono font-bold ${
+                    tx.amount > 0 ? 'text-emerald-400' : 'text-slate-200'
+                  }`}>
+                    {tx.amount > 0 ? `+${tx.amount}` : tx.amount} {tx.symbol}
+                  </p>
+                  <p className="text-[10px] text-slate-500 capitalize">{tx.status}</p>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>
